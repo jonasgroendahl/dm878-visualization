@@ -1,0 +1,32 @@
+.overvi {
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: "100%";
+  height: "100%";
+  position: "absolute";
+  background: "white";
+  display: "flex";
+  justify-content: "center";
+  align-items: "center";
+  flex-direction: "column";
+}
+
+.someDiv {
+  background: "blue";
+  font-size: 80;
+}
+
+.uniListView {
+  overflow: auto;
+}
+
+.uniListItem {
+  display: flex;
+  align-items: center;
+}
+
+.numOfAccepted {
+  font-size: 40;
+  margin-right: 15;
+}
