@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { GeocodeSearch } from "./types";
 import dotenv from "dotenv";
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -17,21 +18,77 @@ type SignUpInfo = {
   grade: string;
 };
 
-type LatLng = { lat: number; lng: number };
+type FormattedSignUpInfo = {
+  id: string;
+  sectionId: string;
+  educationAndPlace: string;
+  totalAccepted: number;
+  standby: number;
+  totalApplicants: number;
+  firstPrio: number;
+  grade: number;
+};
 
-type UniversityWithInfo = { name: string; items: SignUpInfo[] };
+type GeoJsonPoint = {
+  type: "Feature";
+  geometry: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  properties: {
+    name: string;
+  };
+};
 
-const parseCsv = (): Promise<{
-  raw: SignUpInfo[];
+type UniversityWithInfo = { name: string; items: FormattedSignUpInfo[] };
+
+type UnivervisityWithInfoAndCoords = UniversityWithInfo & {
+  location: GeoJsonPoint;
+};
+
+const removeDot = (amountString: string) => amountString.replace(/\./g, "");
+
+const formatRow = (row: SignUpInfo): FormattedSignUpInfo => {
+  const formattedRow: FormattedSignUpInfo = {
+    ...row,
+    totalAccepted: Number(removeDot(row.totalAccepted)),
+    standby: Number(removeDot(row.standby)),
+    totalApplicants: Number(removeDot(row.totalApplicants)),
+    firstPrio: Number(row.firstPrio),
+    grade: Number(row.grade.replace(/,/g, ".")),
+  };
+
+  if (isNaN(formattedRow.totalAccepted)) {
+    formattedRow.totalAccepted = 0;
+  }
+  if (isNaN(formattedRow.standby)) {
+    formattedRow.standby = 0;
+  }
+  if (isNaN(formattedRow.firstPrio)) {
+    formattedRow.firstPrio = 0;
+  }
+  if (isNaN(formattedRow.grade)) {
+    formattedRow.grade = 0;
+  }
+
+  Object.keys(formattedRow).map;
+
+  return formattedRow;
+};
+
+const parseCsv = (
+  csvFileName: string
+): Promise<{
+  raw: FormattedSignUpInfo[];
   map: UniversityWithInfo[];
 }> => {
-  const data: SignUpInfo[] = [];
+  const data: FormattedSignUpInfo[] = [];
 
   const universityMap: UniversityWithInfo[] = [];
 
   return new Promise((resolve) => {
     csv
-      .parseFile(path.join(__dirname, "./hovedtal-2022.csv"), {
+      .parseFile(path.join(__dirname, "data", "csv", csvFileName), {
         headers: [
           "id",
           "sectionId",
@@ -68,8 +125,10 @@ const parseCsv = (): Promise<{
           return;
         }
 
-        data.push(row);
-        universityMap[universityMap.length - 1].items.push(row);
+        const formattedRow = formatRow(row);
+
+        data.push(formattedRow);
+        universityMap[universityMap.length - 1].items.push(formattedRow);
       })
       .on("end", () =>
         resolve({
@@ -80,16 +139,16 @@ const parseCsv = (): Promise<{
   });
 };
 
-const getCoordinates = async (keyword: string): Promise<undefined | LatLng> => {
+const getCoordinates = async (
+  keyword: string
+): Promise<undefined | GeoJsonPoint> => {
   const place = encodeURIComponent(keyword);
 
   const response = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${place}&key=${process.env.GOOGLE_API_KEY}`
   );
 
-  const data: GeocodeSearch = await response.json();
-
-  console.log("firstResult", data);
+  const data = (await response.json()) as GeocodeSearch;
 
   const firstResult = data.results[0];
 
@@ -98,45 +157,87 @@ const getCoordinates = async (keyword: string): Promise<undefined | LatLng> => {
   }
 
   return {
-    lat: firstResult.geometry.location.lat,
-    lng: firstResult.geometry.location.lng,
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [
+        firstResult.geometry.location.lng,
+        firstResult.geometry.location.lat,
+      ],
+    },
+    properties: {
+      name: keyword,
+    },
   };
 };
 
-const main = async () => {
-  const allData = await parseCsv();
-  console.log(allData.raw.length);
-  console.log(allData.map);
+const getDataWithCoordinates = async (dataPoints: {
+  raw: FormattedSignUpInfo[];
+  map: UniversityWithInfo[];
+}): Promise<UnivervisityWithInfoAndCoords[]> => {
+  const allCoords: GeoJsonPoint[] = [];
 
-  const allCoords: LatLng[] = [];
-
-  for (const entry of allData.map) {
+  for (const entry of dataPoints.map) {
     const coords = await getCoordinates(entry.name);
 
-    allCoords.push(coords ?? { lat: 0, lng: 0 });
+    allCoords.push(
+      coords ?? {
+        geometry: {
+          coordinates: [0, 0],
+          type: "Point",
+        },
+        properties: {
+          name: entry.name,
+        },
+        type: "Feature",
+      }
+    );
 
     console.log("coords for ", entry.name, "is ", coords);
   }
 
-  const dataWithCoords: (UniversityWithInfo & { location: LatLng })[] =
-    allData.map.map((uni, i) => ({
+  const dataWithCoords: UnivervisityWithInfoAndCoords[] = dataPoints.map.map(
+    (uni, i) => ({
       ...uni,
       location: allCoords[i],
-    }));
+    })
+  );
 
-  const filePath = path.join(__dirname, "frontend", "data.json");
-  //const filePath = path.join(__dirname, "test.json"); //
-  const uniFilePath = path.join(__dirname, "uni.json");
+  return dataWithCoords;
+};
 
-  fs.writeFileSync(filePath, JSON.stringify(dataWithCoords, null, 2));
+const saveData = (
+  data: UnivervisityWithInfoAndCoords[],
+  fileName: string,
+  uniListFilePath: string
+) => {
+  const filePath = path.join(__dirname, "data", "parsed", fileName);
+  const uniPath = path.join(__dirname, "data", "uni", uniListFilePath);
+
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+
   fs.writeFileSync(
-    uniFilePath,
+    uniPath,
     JSON.stringify(
-      dataWithCoords.map((d) => d.name),
+      data.map((d) => d.name),
       null,
       2
     )
   );
+};
+
+const main = async () => {
+  const allData2020 = await parseCsv("hovedtal-2020.csv");
+  const allData2021 = await parseCsv("hovedtal-2021.csv");
+  const allData2022 = await parseCsv("hovedtal-2022.csv");
+
+  const data2020withCoords = await getDataWithCoordinates(allData2020);
+  const data2021withCoords = await getDataWithCoordinates(allData2021);
+  const data2022withCoords = await getDataWithCoordinates(allData2022);
+
+  saveData(data2020withCoords, "2020.json", "2020-uni.json");
+  saveData(data2021withCoords, "2021.json", "2021-uni.json");
+  saveData(data2022withCoords, "2022.json", "2022-uni.json");
 };
 
 main();
