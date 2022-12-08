@@ -1,13 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import data from "../../data.json";
 import styles from "../../styles/UniOverview.module.css";
+import { BarChart } from "../BarChart";
 import { OverviewOpenContext } from "./MapView";
 
-interface uniData {
+interface UniData {
   selectedUniversity: undefined | typeof data[0];
 }
 
-const UniOverview = ({ selectedUniversity }: uniData) => {
+export const UniOverview: React.FC<UniData> = ({ selectedUniversity }) => {
   const { overviewOpen, setOverViewOpen } = useContext(OverviewOpenContext);
 
   return (
@@ -33,10 +34,16 @@ const UniOverview = ({ selectedUniversity }: uniData) => {
                 );
               })}
           </div>
+          <BarChart
+            data={
+              selectedUniversity.items.map((e) => ({
+                name: e.educationAndPlace,
+                value: e.totalAccepted,
+              })) ?? []
+            }
+          />
         </div>
       ) : null}
     </>
   );
 };
-
-export default UniOverview;

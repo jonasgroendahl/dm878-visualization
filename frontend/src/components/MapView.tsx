@@ -1,9 +1,9 @@
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import React, { createContext, useEffect, useRef, useState } from "react";
-import data from "../../data.json";
+import { createContext, useEffect, useRef, useState } from "react";
+import data from "../../../data/parsed/2022.json";
 import styles from "../../styles/MapView.module.css";
-import UniOverview from "./UniOverView";
+import { UniOverview } from "./UniOverview";
 
 interface IOverviewContext {
   overviewOpen: boolean;
