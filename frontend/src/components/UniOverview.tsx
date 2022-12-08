@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import data from "../../data.json";
+import data from "../../../data/parsed/2022.json";
 import styles from "../../styles/UniOverview.module.css";
 import { BarChart } from "../BarChart";
 import { OverviewOpenContext } from "./MapView";
