@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import data from "../data.json";
+import { BarChart } from "./BarChart";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_APIKEY;
 
@@ -104,6 +105,15 @@ export const App: React.FC = () => {
                   </div>
                 );
               })}
+            <BarChart
+              data={
+                selectedUniversity.items.map((e) => ({
+                  name: e.educationAndPlace,
+                  value: e.totalAccepted ? Number(e.totalAccepted) : 0,
+                  // entry in VIA university has "-" instead of number, fix data set
+                })) ?? []
+              }
+            />
           </div>
         </div>
       ) : null}
