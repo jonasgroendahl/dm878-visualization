@@ -122,7 +122,10 @@ const MapView = () => {
 
         // Create a default Marker and add it to the map.
         const marker = new mapboxgl.Marker()
-          .setLngLat([university.location.lng, university.location.lat])
+          .setLngLat([
+            university.location.geometry.coordinates[1],
+            university.location.geometry.coordinates[0],
+          ])
           .setPopup(popup);
 
         marker.getElement().addEventListener("click", () => {
