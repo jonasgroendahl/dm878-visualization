@@ -1,8 +1,9 @@
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { createContext, useEffect, useRef, useState } from "react";
-import data from "../../../data/parsed/2022.json";
 import styles from "../../styles/MapView.module.css";
+import { Data, getDataSet } from "../common";
+import { DataYear } from "../types";
 import { UniOverview } from "./UniOverview";
 
 interface IOverviewContext {
@@ -15,7 +16,7 @@ export const OverviewOpenContext = createContext<IOverviewContext>({
   setOverViewOpen: () => {},
 });
 
-const MapView = () => {
+const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
   const map = useRef<Map | null>(null);
   const mapContainer = useRef<any>(null);
 
@@ -24,7 +25,7 @@ const MapView = () => {
   const [zoom, setZoom] = useState(8);
 
   const [selectedUniversity, setSelectedUniversity] = useState<
-    undefined | typeof data[0]
+    undefined | Data
   >(undefined);
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
@@ -41,9 +42,15 @@ const MapView = () => {
     });
 
     bubbleMap.on("load", () => {
+      const geojson = {
+        type: "FeatureCollection",
+        features: data.map((item) => item.location),
+      };
+
       bubbleMap.addSource("universities", {
         type: "geojson",
-        data: "./geodata.geojson",
+        //@ts-expect-error fix later
+        data: geojson,
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -108,56 +115,9 @@ const MapView = () => {
     });
   };
 
-  const addMarkers = () => {
-    if (!map.current) {
-      return;
-    }
-
-    for (const university of data) {
-      if (university.location) {
-        // Create a default Popup and add it to the map.
-        const popup = new mapboxgl.Popup()
-          .setText(university.name)
-          .addTo(map.current);
-
-        // Create a default Marker and add it to the map.
-        const marker = new mapboxgl.Marker()
-          .setLngLat([
-            university.location.geometry.coordinates[1],
-            university.location.geometry.coordinates[0],
-          ])
-          .setPopup(popup);
-
-        marker.getElement().addEventListener("click", () => {
-          console.log("selected", university);
-          setSelectedUniversity(university);
-          setOverViewOpen(true);
-        });
-
-        marker.addTo(map.current);
-      }
-    }
-  };
-
   useEffect(() => {
     addBubbles();
-  }, []);
-
-  // useEffect(() => {
-  //   if (map.current || !mapContainer.current) {
-  //     return; // initialize map only once
-  //   }
-  //   map.current = new mapboxgl.Map({
-  //     container: mapContainer.current,
-  //     style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
-  //     center: [lng, lat],
-  //     zoom: zoom,
-  //   });
-
-  //   addMarkers();
-
-  //   map.current.on("load", addMarkers);
-  // }, [map]);
+  }, [year]);
 
   return (
     <div>
