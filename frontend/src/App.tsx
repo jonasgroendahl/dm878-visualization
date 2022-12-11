@@ -8,6 +8,7 @@ import {
   VictoryLabel,
   VictoryTheme,
 } from "victory";
+import { BarChart } from "./BarChart";
 import { Data, getDataSet, SelectableProperty } from "./common";
 
 import MapView from "./components/MapView";
@@ -63,34 +64,20 @@ export const App: React.FC = () => {
           </div>
         </div>
         <div>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            domainPadding={{
-              y: 200,
-            }}
-            height={800}
-            width={400}
-          >
-            <VictoryAxis />
-            <VictoryAxis dependentAxis />
-            <VictoryBar
-              width={200}
-              horizontal={true}
-              data={data.map((d) => {
-                const elems = d.items.reduce(
-                  (acc, i) => (acc += i[property] ?? 0),
-                  0
-                );
-                return {
-                  y: elems,
-                  x: d.location.properties.name,
-                };
-              })}
-              style={{
-                data: { fill: "#c43a31" },
-              }}
-            />
-          </VictoryChart>
+          <BarChart
+            height={400}
+            width={800}
+            data={data.map((d) => {
+              const elems = d.items.reduce(
+                (acc, i) => (acc += i[property] ?? 0),
+                0
+              );
+              return {
+                value: elems,
+                name: d.location.properties.name,
+              };
+            })}
+          />
         </div>
       </div>
     </div>
