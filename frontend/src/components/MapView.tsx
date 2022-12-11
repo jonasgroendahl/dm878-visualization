@@ -34,7 +34,7 @@ const MapView = () => {
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
 
-  const returnUniversityFromLocation = (name: String) => {
+  const returnUniversityFromLocation = (name: string) => {
     return data.find((obj) => obj.name === name);
   };
 
