@@ -15,12 +15,9 @@ export const UniOverview: React.FC<UniData> = ({ selectedUniversity }) => {
     <>
       {selectedUniversity && overviewOpen ? (
         <div className={styles.overviewBody}>
-          <div className={styles.someDiv}>some text</div>
           <div>
             <h2>{selectedUniversity.name}</h2>
-            <button onClick={() => setOverViewOpen(!overviewOpen)}>
-              Go back
-            </button>
+            <button onClick={() => setOverViewOpen(false)}>Go back</button>
           </div>
           <div className={styles.uniListView}>
             {selectedUniversity.items

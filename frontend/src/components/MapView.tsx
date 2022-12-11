@@ -16,8 +16,13 @@ export const OverviewOpenContext = createContext<IOverviewContext>({
 });
 
 const MapView = () => {
-  const map = useRef<Map | null>(null);
-  const mapContainer = useRef<any>(null);
+  const geojson = {
+    type: "FeatureCollection",
+    features: data.map((item) => item.location),
+  };
+
+  // const map = useRef<Map | null>(null);
+  // const mapContainer = useRef<any>(null);
 
   const [lng, setLng] = useState(9.536354);
   const [lat, setLat] = useState(55.711311);
@@ -28,13 +33,14 @@ const MapView = () => {
   >(undefined);
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
-  const toggleOverviewOpen = () => {
-    setOverViewOpen(!overviewOpen);
+
+  const returnUniversityFromLocation = (name: String) => {
+    return data.find((obj) => obj.name === name);
   };
 
   const addBubbles = () => {
     const bubbleMap = new mapboxgl.Map({
-      container: mapContainer.current,
+      container: "mapContainer",
       style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
       center: [lng, lat],
       zoom: zoom,
@@ -43,7 +49,7 @@ const MapView = () => {
     bubbleMap.on("load", () => {
       bubbleMap.addSource("universities", {
         type: "geojson",
-        data: "./geodata.geojson",
+        data: geojson, //Again, Typescript complaining but its working
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -105,71 +111,82 @@ const MapView = () => {
           "circle-stroke-color": "#fff",
         },
       });
+
+      bubbleMap.on("click", (e) => {
+        const features = bubbleMap.queryRenderedFeatures(e.point, {
+          layers: ["clusters"],
+        });
+        if (features[0]) {
+          const clusterId = features[0].properties?.cluster_id;
+          const source: mapboxgl.GeoJSONSource = bubbleMap.getSource(
+            "universities"
+          ) as mapboxgl.GeoJSONSource;
+
+          source.getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+            if (err) return;
+
+            bubbleMap.easeTo({
+              center: features[0].geometry.coordinates, // Typescript complaining here, but it runs fine
+              zoom: zoom,
+            });
+          });
+        }
+      });
+
+      bubbleMap.on("click", "unclustered-point", (e) => {
+        const features = bubbleMap.queryRenderedFeatures(e.point, {
+          layers: ["unclustered-point"],
+        });
+
+        if (features[0]) {
+          console.log(overviewOpen);
+          setOverViewOpen(true);
+          setSelectedUniversity(
+            returnUniversityFromLocation(features[0].properties?.name)
+          );
+        }
+      });
+
+      bubbleMap.on("mouseenter", "unclustered-point", () => {
+        bubbleMap.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      bubbleMap.on("mouseleave", "unclustered-point", () => {
+        bubbleMap.getCanvas().style.cursor = "";
+      });
+
+      bubbleMap.on("mouseenter", "clusters", () => {
+        bubbleMap.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      bubbleMap.on("mouseleave", "clusters", () => {
+        bubbleMap.getCanvas().style.cursor = "";
+      });
     });
   };
 
-  const addMarkers = () => {
-    if (!map.current) {
-      return;
-    }
-
-    for (const university of data) {
-      if (university.location) {
-        // Create a default Popup and add it to the map.
-        const popup = new mapboxgl.Popup()
-          .setText(university.name)
-          .addTo(map.current);
-
-        // Create a default Marker and add it to the map.
-        const marker = new mapboxgl.Marker()
-          .setLngLat([
-            university.location.geometry.coordinates[1],
-            university.location.geometry.coordinates[0],
-          ])
-          .setPopup(popup);
-
-        marker.getElement().addEventListener("click", () => {
-          console.log("selected", university);
-          setSelectedUniversity(university);
-          setOverViewOpen(true);
-        });
-
-        marker.addTo(map.current);
-      }
-    }
-  };
-
   useEffect(() => {
-    addBubbles();
-  }, []);
-
-  // useEffect(() => {
-  //   if (map.current || !mapContainer.current) {
-  //     return; // initialize map only once
-  //   }
-  //   map.current = new mapboxgl.Map({
-  //     container: mapContainer.current,
-  //     style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
-  //     center: [lng, lat],
-  //     zoom: zoom,
-  //   });
-
-  //   addMarkers();
-
-  //   map.current.on("load", addMarkers);
-  // }, [map]);
+    if (!overviewOpen) {
+      addBubbles();
+    }
+  }, [overviewOpen]);
 
   return (
     <div>
-      <OverviewOpenContext.Provider
-        value={{
-          overviewOpen,
-          setOverViewOpen,
-        }}
-      >
-        <UniOverview selectedUniversity={selectedUniversity} />
-      </OverviewOpenContext.Provider>
-      <div className={styles.mapBody} ref={mapContainer} />
+      {overviewOpen ? (
+        <OverviewOpenContext.Provider
+          value={{
+            overviewOpen,
+            setOverViewOpen,
+          }}
+        >
+          <UniOverview selectedUniversity={selectedUniversity} />
+        </OverviewOpenContext.Provider>
+      ) : (
+        <div className={styles.mapBody} id="mapContainer" />
+      )}
     </div>
   );
 };
