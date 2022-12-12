@@ -7360,8 +7360,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.5116843,
-          55.7860282
+          12.5129985,
+          55.78606929999999
         ]
       },
       "properties": {
@@ -7538,17 +7538,17 @@
     ],
     "name": "MARTEC - Maritime and Polytechnic University College",
     "location": {
-      "type": "Feature",
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          -0.1340401,
-          51.52455920000001
-        ]
+          0,
+          0
+        ],
+        "type": "Point"
       },
       "properties": {
         "name": "MARTEC - Maritime and Polytechnic University College"
-      }
+      },
+      "type": "Feature"
     }
   },
   {
@@ -7954,17 +7954,17 @@
     ],
     "name": "Københavns Erhvervsakademi (KEA)",
     "location": {
-      "type": "Feature",
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          12.5546997,
-          55.6916035
-        ]
+          0,
+          0
+        ],
+        "type": "Point"
       },
       "properties": {
         "name": "Københavns Erhvervsakademi (KEA)"
-      }
+      },
+      "type": "Feature"
     }
   },
   {
@@ -8752,8 +8752,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          9.7780195,
-          54.9134537
+          8.4469107,
+          55.4877012
         ]
       },
       "properties": {
@@ -9325,7 +9325,7 @@
         "educationAndPlace": "Installatør, VVS, Randers SØ, Studiestart: sommerstart",
         "totalAccepted": 0,
         "standby": 0,
-        "totalApplicants": null,
+        "totalApplicants": 0,
         "firstPrio": 0,
         "grade": 0
       },

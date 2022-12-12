@@ -58,20 +58,21 @@ const formatRow = (row: SignUpInfo): FormattedSignUpInfo => {
     grade: Number(row.grade.replace(/,/g, ".")),
   };
 
-  if (isNaN(formattedRow.totalAccepted)) {
+  if (!formattedRow.totalAccepted || isNaN(formattedRow.totalAccepted)) {
     formattedRow.totalAccepted = 0;
   }
-  if (isNaN(formattedRow.standby)) {
+  if (!formattedRow.standby || isNaN(formattedRow.standby)) {
     formattedRow.standby = 0;
   }
-  if (isNaN(formattedRow.firstPrio)) {
+  if (!formattedRow.firstPrio || isNaN(formattedRow.firstPrio)) {
     formattedRow.firstPrio = 0;
   }
-  if (isNaN(formattedRow.grade)) {
+  if (!formattedRow.grade || isNaN(formattedRow.grade)) {
     formattedRow.grade = 0;
   }
-
-  Object.keys(formattedRow).map;
+  if (!formattedRow.totalApplicants || isNaN(formattedRow.totalApplicants)) {
+    formattedRow.totalApplicants = 0;
+  }
 
   return formattedRow;
 };
