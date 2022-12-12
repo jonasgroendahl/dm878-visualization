@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import React, { useEffect, useRef } from "react";
 interface IBarChartProps {
   data: { name: string; value: number }[];
   width?: number;
@@ -16,7 +16,7 @@ export const BarChart: React.FC<IBarChartProps> = ({
 }) => {
   const ref = useRef<SVGSVGElement>(null);
 
-  console.log(data);
+  // console.log(data);
 
   useEffect(() => {
     const container = ref.current;
