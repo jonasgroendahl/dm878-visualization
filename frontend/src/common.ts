@@ -27,9 +27,13 @@ export const getDataSet = (y: DataYear) => {
 
 export const stripSummerWinterInfo = (label: string) => {
   const partOfStringNeedsRemoval = label.indexOf("Studiestart");
+  const partOfStringNeedsRemoval2 = label.indexOf("Study start");
 
   if (partOfStringNeedsRemoval) {
     return label.slice(0, partOfStringNeedsRemoval - 2);
+  }
+  if (partOfStringNeedsRemoval2) {
+    return label.slice(0, partOfStringNeedsRemoval2 - 2);
   }
   return label;
 };
