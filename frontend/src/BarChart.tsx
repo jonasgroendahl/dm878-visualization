@@ -1,16 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { svg } from "d3";
-
 interface IBarChartProps {
   data: { name: string; value: number }[];
+  width?: number;
+  height?: number;
 }
 
 const WIDTH = 1200;
 const HEIGHT = 600;
 
-export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
+export const BarChart: React.FC<IBarChartProps> = ({
+  data,
+  width = WIDTH,
+  height = HEIGHT,
+}) => {
   const ref = useRef<SVGSVGElement>(null);
+
+  console.log(data);
 
   useEffect(() => {
     const container = ref.current;
@@ -19,19 +25,23 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
 
     const svg = d3
       .select(container)
-      .attr("height", HEIGHT)
-      .attr("width", WIDTH)
+      .attr("height", height)
+      .attr("width", width)
       .style("overflow", "visible")
       .style("margin", "50px")
       .style("margin-bottom", "250px")
       .classed("container", true);
+
+    // clear all previous content on refresh
+    const everything = svg.selectAll("*");
+    everything.remove();
 
     // scaling
 
     const xScale = d3
       .scaleBand()
       .domain(data.map((value) => value.name))
-      .rangeRound([0, WIDTH])
+      .rangeRound([0, width])
       .padding(0.1);
 
     // find max to determine domain
@@ -40,7 +50,7 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
     const yScale = d3
       .scaleLinear()
       .domain([0, max + 10]) // + 10 to make the graph a tiny bit taller than max
-      .range([HEIGHT, 0]);
+      .range([height, 0]);
 
     // axes
 
@@ -48,11 +58,11 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
       .axisBottom(xScale)
       .ticks(data.length)
       .tickFormat((v) => {
-        const largeLetterIndex = v.slice(1).match(/[A-Z]/u);
+        // const largeLetterIndex = v.slice(1).match(/[A-Z]/u);
 
-        if (largeLetterIndex && largeLetterIndex.index) {
-          return v.slice(0, largeLetterIndex.index - 1);
-        }
+        // if (largeLetterIndex && largeLetterIndex.index) {
+        //   return v.slice(0, largeLetterIndex.index - 1);
+        // }
 
         return v;
       });
@@ -63,7 +73,7 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
       .append("g")
       .classed("x", true)
       .call(xAxis)
-      .attr("transform", `translate(0, ${HEIGHT})`);
+      .attr("transform", `translate(0, ${height})`);
     svg.append("g").call(yAxis);
 
     const bars = svg
@@ -73,7 +83,8 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
       .append("rect")
       .classed("bar", true)
       .attr("width", xScale.bandwidth())
-      .attr("height", (d) => HEIGHT - yScale(d.value))
+      .attr("height", (d) => height - yScale(d.value))
+      //@ts-expect-error not sure
       .attr("x", (d) => xScale(d.name))
       .attr("y", (d) => yScale(d.value))
       .attr("fill", "red");
@@ -84,7 +95,7 @@ export const BarChart: React.FC<IBarChartProps> = ({ data }) => {
       .attr("text-anchor", "start")
       .attr("x", 10)
       .attr("y", -5);
-  }, [ref]);
+  }, [ref, data]);
 
   return <svg ref={ref} />;
 };
