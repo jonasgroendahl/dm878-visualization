@@ -35,11 +35,6 @@ export const App: React.FC = () => {
     setYear(y);
   };
 
-  useEffect(() => {
-    console.log("barchart data: ", barChartData);
-    // console.log("mapData: ", mapData);
-  });
-
   const mapData = useMemo(() => {
     let mapData: typeof data = data;
 
