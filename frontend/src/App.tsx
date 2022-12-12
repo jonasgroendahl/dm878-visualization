@@ -1,30 +1,61 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import React, { useMemo, useState } from "react";
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryLabel,
-  VictoryTheme,
-} from "victory";
 import { BarChart } from "./BarChart";
-import { Data, getDataSet, SelectableProperty } from "./common";
+import {
+  getDataSet,
+  SelectableProperty,
+  stripSummerWinterInfo,
+  View,
+  DataYear,
+} from "./common";
 
 import MapView from "./components/MapView";
-import { DataYear } from "./types";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_APIKEY;
+
+const PropertyTabs: { label: string; value: SelectableProperty }[] = [
+  { label: "Accepted students", value: "totalAccepted" },
+  { label: "Total applicants", value: "totalApplicants" },
+];
+
+const ViewTabs: { label: string; value: View }[] = [
+  { label: "By university", value: "University" },
+  { label: "Top 20 majors", value: "Top20Majors" },
+];
 
 export const App: React.FC = () => {
   const [year, setYear] = useState<DataYear>("2022");
   const [property, setProperty] = useState<SelectableProperty>("totalAccepted");
+  const [view, setView] = useState<View>("University");
 
   const data = useMemo(() => getDataSet(year), [year]);
 
   const handleSelectYear = (y: DataYear) => {
     setYear(y);
   };
+
+  const barChartData = useMemo(() => {
+    if (view === "University") {
+      return data.map((d) => {
+        const elems = d.items.reduce((acc, i) => (acc += i[property] ?? 0), 0);
+        return {
+          value: elems,
+          name: d.location.properties.name,
+        };
+      });
+    } else {
+      return data
+        .map((uni) => uni.items)
+        .flat()
+        .sort((x, y) => y[property] - x[property])
+        .map((item) => ({
+          value: item[property],
+          name: stripSummerWinterInfo(item.educationAndPlace),
+        }))
+        .slice(0, 20);
+    }
+  }, [view, property, data]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -51,33 +82,30 @@ export const App: React.FC = () => {
           </div>
 
           <div className="tabs">
-            {["totalAccepted", "totalApplicants"].map((prop) => (
+            {PropertyTabs.map((prop) => (
               <button
-                className={property === prop ? "selected" : undefined}
-                onClick={() =>
-                  setProperty(prop as "totalAccepted" | "totalApplicants")
-                }
+                className={property === prop.value ? "selected" : undefined}
+                onClick={() => setProperty(prop.value)}
               >
-                {prop}
+                {prop.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{ marginTop: 20 }}>
+          <div className="tabs">
+            {ViewTabs.map((prop) => (
+              <button
+                className={view === prop.value ? "selected" : undefined}
+                onClick={() => setView(prop.value)}
+              >
+                {prop.label}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <BarChart
-            height={400}
-            width={800}
-            data={data.map((d) => {
-              const elems = d.items.reduce(
-                (acc, i) => (acc += i[property] ?? 0),
-                0
-              );
-              return {
-                value: elems,
-                name: d.location.properties.name,
-              };
-            })}
-          />
+          <BarChart height={400} width={800} data={barChartData} />
         </div>
       </div>
     </div>

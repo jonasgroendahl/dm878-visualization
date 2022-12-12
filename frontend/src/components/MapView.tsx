@@ -2,8 +2,7 @@ import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { createContext, useEffect, useRef, useState } from "react";
 import styles from "../../styles/MapView.module.css";
-import { Data, getDataSet } from "../common";
-import { DataYear } from "../types";
+import { Data, DataYear } from "../common";
 import { UniOverview } from "./UniOverview";
 
 interface IOverviewContext {
@@ -39,6 +38,7 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
       style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
       center: [lng, lat],
       zoom: zoom,
+      pitchWithRotate: false,
     });
 
     bubbleMap.on("load", () => {

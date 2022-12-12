@@ -1,7 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { svg } from "d3";
-
 interface IBarChartProps {
   data: { name: string; value: number }[];
   width?: number;
@@ -18,6 +16,8 @@ export const BarChart: React.FC<IBarChartProps> = ({
 }) => {
   const ref = useRef<SVGSVGElement>(null);
 
+  console.log(data);
+
   useEffect(() => {
     const container = ref.current;
 
@@ -31,6 +31,10 @@ export const BarChart: React.FC<IBarChartProps> = ({
       .style("margin", "50px")
       .style("margin-bottom", "250px")
       .classed("container", true);
+
+    // clear all previous content on refresh
+    const everything = svg.selectAll("*");
+    everything.remove();
 
     // scaling
 
@@ -54,11 +58,11 @@ export const BarChart: React.FC<IBarChartProps> = ({
       .axisBottom(xScale)
       .ticks(data.length)
       .tickFormat((v) => {
-        const largeLetterIndex = v.slice(1).match(/[A-Z]/u);
+        // const largeLetterIndex = v.slice(1).match(/[A-Z]/u);
 
-        if (largeLetterIndex && largeLetterIndex.index) {
-          return v.slice(0, largeLetterIndex.index - 1);
-        }
+        // if (largeLetterIndex && largeLetterIndex.index) {
+        //   return v.slice(0, largeLetterIndex.index - 1);
+        // }
 
         return v;
       });
@@ -75,12 +79,12 @@ export const BarChart: React.FC<IBarChartProps> = ({
     const bars = svg
       .selectAll(".bar")
       .data(data)
-      .join("rect")
-      //.enter()
-      //.append("rect")
+      .enter()
+      .append("rect")
       .classed("bar", true)
       .attr("width", xScale.bandwidth())
       .attr("height", (d) => height - yScale(d.value))
+      //@ts-expect-error not sure
       .attr("x", (d) => xScale(d.name))
       .attr("y", (d) => yScale(d.value))
       .attr("fill", "red");
