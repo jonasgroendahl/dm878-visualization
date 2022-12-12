@@ -1,8 +1,8 @@
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { createContext, useEffect, useRef, useState } from "react";
-import data from "../../../data/parsed/2022.json";
 import styles from "../../styles/MapView.module.css";
+import { Data, DataYear } from "../common";
 import { UniOverview } from "./UniOverview";
 
 interface IOverviewContext {
@@ -15,21 +15,16 @@ export const OverviewOpenContext = createContext<IOverviewContext>({
   setOverViewOpen: () => {},
 });
 
-const MapView = () => {
-  const geojson = {
-    type: "FeatureCollection",
-    features: data.map((item) => item.location),
-  };
-
-  // const map = useRef<Map | null>(null);
-  // const mapContainer = useRef<any>(null);
+const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
+  const map = useRef<Map | null>(null);
+  const mapContainer = useRef<any>(null);
 
   const [lng, setLng] = useState(9.536354);
   const [lat, setLat] = useState(55.711311);
   const [zoom, setZoom] = useState(8);
 
   const [selectedUniversity, setSelectedUniversity] = useState<
-    undefined | typeof data[0]
+    undefined | Data
   >(undefined);
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
@@ -44,12 +39,19 @@ const MapView = () => {
       style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
       center: [lng, lat],
       zoom: zoom,
+      pitchWithRotate: false,
     });
 
     bubbleMap.on("load", () => {
+      const geojson = {
+        type: "FeatureCollection",
+        features: data.map((item) => item.location),
+      };
+
       bubbleMap.addSource("universities", {
         type: "geojson",
-        data: geojson, //Again, Typescript complaining but its working
+        //@ts-expect-error fix later
+        data: geojson,
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
