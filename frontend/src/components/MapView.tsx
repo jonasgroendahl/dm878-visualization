@@ -203,6 +203,30 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
 
   return (
     <div>
+      <div id="state-legend" className={styles.legend}>
+        <h4>Amounts</h4>
+        <div>
+          <span style={{ backgroundColor: "#6efa96" }}></span>0 - 500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#c9d03b" }}></span>1500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff9932" }}></span>4000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff794d" }}></span>4000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff5a6d" }}></span>7500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff4491" }}></span>10 000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#f64051" }}></span>20 000
+        </div>
+      </div>
       {overviewOpen ? (
         <OverviewOpenContext.Provider
           value={{
