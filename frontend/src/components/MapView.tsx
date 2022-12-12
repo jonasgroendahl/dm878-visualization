@@ -28,13 +28,14 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
   >(undefined);
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
-  const toggleOverviewOpen = () => {
-    setOverViewOpen(!overviewOpen);
+
+  const returnUniversityFromLocation = (name: string) => {
+    return data.find((obj) => obj.name === name);
   };
 
   const addBubbles = () => {
     const bubbleMap = new mapboxgl.Map({
-      container: mapContainer.current,
+      container: "mapContainer",
       style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
       center: [lng, lat],
       zoom: zoom,
@@ -112,24 +113,82 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
           "circle-stroke-color": "#fff",
         },
       });
+
+      bubbleMap.on("click", (e) => {
+        const features = bubbleMap.queryRenderedFeatures(e.point, {
+          layers: ["clusters"],
+        });
+        if (features[0]) {
+          const clusterId = features[0].properties?.cluster_id;
+          const source: mapboxgl.GeoJSONSource = bubbleMap.getSource(
+            "universities"
+          ) as mapboxgl.GeoJSONSource;
+
+          source.getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+            if (err) return;
+
+            bubbleMap.easeTo({
+              center: features[0].geometry.coordinates, // Typescript complaining here, but it runs fine
+              zoom: zoom,
+            });
+          });
+        }
+      });
+
+      bubbleMap.on("click", "unclustered-point", (e) => {
+        const features = bubbleMap.queryRenderedFeatures(e.point, {
+          layers: ["unclustered-point"],
+        });
+
+        if (features[0]) {
+          console.log(overviewOpen);
+          setOverViewOpen(true);
+          setSelectedUniversity(
+            returnUniversityFromLocation(features[0].properties?.name)
+          );
+        }
+      });
+
+      bubbleMap.on("mouseenter", "unclustered-point", () => {
+        bubbleMap.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      bubbleMap.on("mouseleave", "unclustered-point", () => {
+        bubbleMap.getCanvas().style.cursor = "";
+      });
+
+      bubbleMap.on("mouseenter", "clusters", () => {
+        bubbleMap.getCanvas().style.cursor = "pointer";
+      });
+
+      // Change it back to a pointer when it leaves.
+      bubbleMap.on("mouseleave", "clusters", () => {
+        bubbleMap.getCanvas().style.cursor = "";
+      });
     });
   };
 
   useEffect(() => {
-    addBubbles();
-  }, [year]);
+    if (!overviewOpen) {
+      addBubbles();
+    }
+  }, [overviewOpen]);
 
   return (
     <div>
-      <OverviewOpenContext.Provider
-        value={{
-          overviewOpen,
-          setOverViewOpen,
-        }}
-      >
-        <UniOverview selectedUniversity={selectedUniversity} />
-      </OverviewOpenContext.Provider>
-      <div className={styles.mapBody} ref={mapContainer} />
+      {overviewOpen ? (
+        <OverviewOpenContext.Provider
+          value={{
+            overviewOpen,
+            setOverViewOpen,
+          }}
+        >
+          <UniOverview selectedUniversity={selectedUniversity} />
+        </OverviewOpenContext.Provider>
+      ) : (
+        <div className={styles.mapBody} id="mapContainer" />
+      )}
     </div>
   );
 };

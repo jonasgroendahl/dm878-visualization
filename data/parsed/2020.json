@@ -7250,8 +7250,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.5116843,
-          55.7860282
+          12.5129985,
+          55.78606929999999
         ]
       },
       "properties": {
@@ -7884,17 +7884,17 @@
     ],
     "name": "Københavns Erhvervsakademi (KEA)",
     "location": {
-      "type": "Feature",
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          12.5546997,
-          55.6916035
-        ]
+          0,
+          0
+        ],
+        "type": "Point"
       },
       "properties": {
         "name": "Københavns Erhvervsakademi (KEA)"
-      }
+      },
+      "type": "Feature"
     }
   },
   {
@@ -8692,8 +8692,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          9.7780195,
-          54.9134537
+          8.4469107,
+          55.4877012
         ]
       },
       "properties": {
