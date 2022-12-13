@@ -17,7 +17,7 @@ export const OverviewOpenContext = createContext<IOverviewContext>({
 
 const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
   const map = useRef<Map | null>(null);
-  const mapContainer = useRef<any>();
+  const mapContainer = useRef<any>(null);
 
   const [lng, setLng] = useState(10.55559);
   const [lat, setLat] = useState(56.114816);
