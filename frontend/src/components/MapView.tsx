@@ -1,6 +1,6 @@
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { createContext, createRef, useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import styles from "../../styles/MapView.module.css";
 import { Data, DataYear } from "../common";
 import { UniOverview } from "./UniOverview";
@@ -17,7 +17,7 @@ export const OverviewOpenContext = createContext<IOverviewContext>({
 
 const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
   const map = useRef<Map | null>(null);
-  const mapContainer = createRef<any>();
+  const mapContainer = useRef<any>();
 
   const [lng, setLng] = useState(10.55559);
   const [lat, setLat] = useState(56.114816);
