@@ -27,7 +27,7 @@ const ViewTabs: { label: string; value: View }[] = [
 export const App: React.FC = () => {
   const [year, setYear] = useState<DataYear>("2022");
   const [property, setProperty] = useState<SelectableProperty>("totalAccepted");
-  const [view, setView] = useState<View>("Top20Majors");
+  const [view, setView] = useState<View>("University");
 
   const data = useMemo(() => getDataSet(year), [year]);
 
