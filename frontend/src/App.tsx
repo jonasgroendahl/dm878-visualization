@@ -3,11 +3,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import React, { useMemo, useState } from "react";
 import { BarChart } from "./BarChart";
 import {
+  DataYear,
   getDataSet,
   SelectableProperty,
   stripSummerWinterInfo,
   View,
-  DataYear,
 } from "./common";
 
 import MapView from "./components/MapView";
@@ -35,6 +35,24 @@ export const App: React.FC = () => {
     setYear(y);
   };
 
+  const mapData = useMemo(() => {
+    let mapData: typeof data = data;
+
+    for (const key in mapData) {
+      if (mapData.hasOwnProperty(key)) {
+        const length = mapData[key].items.length;
+        const sum = mapData[key].items.reduce(
+          (acc, i) => (acc += i[property] ?? 0),
+          0
+        );
+
+        mapData[key].location.properties["numOfItems"] = length;
+        mapData[key].location.properties["propertySum"] = sum;
+      }
+    }
+    return mapData;
+  }, [property, data]);
+
   const barChartData = useMemo(() => {
     if (view === "University") {
       return data.map((d) => {
@@ -59,8 +77,8 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ width: "60vw", borderRight: "solid 1px #eee" }}>
-        <MapView data={data} year={year} />
+      <div style={{ minWidth: "50vw", borderRight: "solid 1px #eee" }}>
+        <MapView data={mapData} year={year} />
       </div>
       <div style={{ padding: 20, flex: 1 }}>
         <div
@@ -105,7 +123,7 @@ export const App: React.FC = () => {
           </div>
         </div>
         <div>
-          <BarChart height={400} width={800} data={barChartData} />
+          <BarChart height={250} width={500} data={barChartData} />
         </div>
       </div>
     </div>

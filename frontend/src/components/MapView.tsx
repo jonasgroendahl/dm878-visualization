@@ -19,9 +19,10 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
   const map = useRef<Map | null>(null);
   const mapContainer = useRef<any>(null);
 
-  const [lng, setLng] = useState(9.536354);
-  const [lat, setLat] = useState(55.711311);
-  const [zoom, setZoom] = useState(8);
+  const [lng, setLng] = useState(10.55559);
+  const [lat, setLat] = useState(56.114816);
+  const [zoom, setZoom] = useState(6.5);
+  const [mapData, setMapData] = useState<typeof data>([]);
 
   const [selectedUniversity, setSelectedUniversity] = useState<
     undefined | Data
@@ -29,26 +30,37 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
 
   const [overviewOpen, setOverViewOpen] = useState<boolean>(false);
 
-  const returnUniversityFromLocation = (name: string) => {
+  const getUniversityFromLocation = (name: string) => {
     return data.find((obj) => obj.name === name);
   };
 
-  const addBubbles = () => {
-    const bubbleMap = new mapboxgl.Map({
-      container: "mapContainer",
+  const createBubbleMap = () => {
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      projection: "globe",
       style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
       center: [lng, lat],
       zoom: zoom,
       pitchWithRotate: false,
     });
 
-    bubbleMap.on("load", () => {
+    map.on("style.load", () => {
+      map.setFog({
+        color: "rgb(186, 210, 235)", // Lower atmosphere
+        "high-color": "rgb(36, 92, 223)", // Upper atmosphere
+        "horizon-blend": 0.02, // Atmosphere thickness (default 0.2 at low zooms)
+        "space-color": "rgb(11, 11, 25)", // Background color
+        "star-intensity": 0.6, // Background star brightness (default 0.35 at low zoooms )
+      });
+    });
+
+    map.on("load", () => {
       const geojson = {
         type: "FeatureCollection",
-        features: data.map((item) => item.location),
+        features: mapData.map((item) => item.location),
       };
 
-      bubbleMap.addSource("universities", {
+      map.addSource("universities", {
         type: "geojson",
         //@ts-expect-error fix later
         data: geojson,
@@ -57,7 +69,7 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
         clusterRadius: 50,
       });
 
-      bubbleMap.addLayer({
+      map.addLayer({
         id: "clusters",
         type: "circle",
         source: "universities",
@@ -89,7 +101,7 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
         },
       });
 
-      bubbleMap.addLayer({
+      map.addLayer({
         id: "cluster-count",
         type: "symbol",
         source: "universities",
@@ -101,33 +113,59 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
         },
       });
 
-      bubbleMap.addLayer({
+      map.addLayer({
         id: "unclustered-point",
         type: "circle",
         source: "universities",
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#11b4da",
-          "circle-radius": 12,
+          "circle-color": [
+            "step",
+            ["get", "propertySum"],
+            "#6efa96",
+            500,
+            "#c9d03b",
+            1500,
+            "#ff9932",
+            4000,
+            "#ff794d",
+            7000,
+            "#ff5a6d",
+            10000,
+            "#ff4491",
+            20000,
+            "#f64051",
+          ],
+          "circle-radius": [
+            "step",
+            ["get", "propertySum"],
+            10,
+            500,
+            15,
+            1500,
+            20,
+            4000,
+            25,
+          ],
           "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
+          "circle-stroke-color": "#AAF5AB",
         },
       });
 
-      bubbleMap.on("click", (e) => {
-        const features = bubbleMap.queryRenderedFeatures(e.point, {
+      map.on("click", (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
           layers: ["clusters"],
         });
         if (features[0]) {
           const clusterId = features[0].properties?.cluster_id;
-          const source: mapboxgl.GeoJSONSource = bubbleMap.getSource(
+          const source: mapboxgl.GeoJSONSource = map.getSource(
             "universities"
           ) as mapboxgl.GeoJSONSource;
 
           source.getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
             if (err) return;
 
-            bubbleMap.easeTo({
+            map.easeTo({
               center: features[0].geometry.coordinates, // Typescript complaining here, but it runs fine
               zoom: zoom,
             });
@@ -135,48 +173,70 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
         }
       });
 
-      bubbleMap.on("click", "unclustered-point", (e) => {
-        const features = bubbleMap.queryRenderedFeatures(e.point, {
+      map.on("click", "unclustered-point", (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
           layers: ["unclustered-point"],
         });
 
         if (features[0]) {
-          console.log(overviewOpen);
           setOverViewOpen(true);
           setSelectedUniversity(
-            returnUniversityFromLocation(features[0].properties?.name)
+            getUniversityFromLocation(features[0].properties?.name)
           );
         }
       });
 
-      bubbleMap.on("mouseenter", "unclustered-point", () => {
-        bubbleMap.getCanvas().style.cursor = "pointer";
+      map.on("mouseenter", "unclustered-point", () => {
+        map.getCanvas().style.cursor = "pointer";
       });
 
       // Change it back to a pointer when it leaves.
-      bubbleMap.on("mouseleave", "unclustered-point", () => {
-        bubbleMap.getCanvas().style.cursor = "";
+      map.on("mouseleave", "unclustered-point", () => {
+        map.getCanvas().style.cursor = "";
       });
 
-      bubbleMap.on("mouseenter", "clusters", () => {
-        bubbleMap.getCanvas().style.cursor = "pointer";
+      map.on("mouseenter", "clusters", () => {
+        map.getCanvas().style.cursor = "pointer";
       });
 
       // Change it back to a pointer when it leaves.
-      bubbleMap.on("mouseleave", "clusters", () => {
-        bubbleMap.getCanvas().style.cursor = "";
+      map.on("mouseleave", "clusters", () => {
+        map.getCanvas().style.cursor = "";
       });
     });
   };
 
   useEffect(() => {
-    if (!overviewOpen) {
-      addBubbles();
-    }
-  }, [overviewOpen]);
+    setMapData(data);
+    createBubbleMap();
+  });
 
   return (
     <div>
+      <div id="state-legend" className={styles.legend}>
+        <h4>Amounts</h4>
+        <div>
+          <span style={{ backgroundColor: "#6efa96" }}></span>0 - 500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#c9d03b" }}></span>1500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff9932" }}></span>4000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff794d" }}></span>4000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff5a6d" }}></span>7500
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#ff4491" }}></span>10 000
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#f64051" }}></span>20 000
+        </div>
+      </div>
       {overviewOpen ? (
         <OverviewOpenContext.Provider
           value={{
@@ -186,9 +246,8 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = ({ year, data }) => {
         >
           <UniOverview selectedUniversity={selectedUniversity} />
         </OverviewOpenContext.Provider>
-      ) : (
-        <div className={styles.mapBody} id="mapContainer" />
-      )}
+      ) : null}
+      <div className={styles.mapBody} ref={mapContainer} />
     </div>
   );
 };

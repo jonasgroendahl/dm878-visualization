@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import data from "../../../data/parsed/2022.json";
 import styles from "../../styles/UniOverview.module.css";
 import { BarChart } from "../BarChart";
+import { Data, DataYear } from "../common";
 import { OverviewOpenContext } from "./MapView";
 
 interface UniData {
@@ -31,14 +32,14 @@ export const UniOverview: React.FC<UniData> = ({ selectedUniversity }) => {
                 );
               })}
           </div>
-          <BarChart
+          {/* <BarChart
             data={
               selectedUniversity.items.map((e) => ({
                 name: e.educationAndPlace,
                 value: e.totalAccepted,
               })) ?? []
             }
-          />
+          /> */}
         </div>
       ) : null}
     </>
