@@ -2,7 +2,7 @@ import data2022 from "../../data/parsed/2022.json";
 import data2021 from "../../data/parsed/2021.json";
 import data2020 from "../../data/parsed/2020.json";
 
-export type DataYear = "2020" | "2021" | "2022";
+export type DataYear = "2020" | "2021" | "2022" | "2019" | "2018";
 
 export type Data = typeof data2022;
 
@@ -11,7 +11,9 @@ export type SelectableProperty = keyof Pick<
   "totalAccepted" | "totalApplicants"
 >;
 
-export type View = "University" | "Top20Majors";
+export type View = "University" | "Top20Majors" | "Overall" | "Least20";
+
+export type TopNavView = "ByYear" | "Historic";
 
 export const getDataSet = (y: DataYear) => {
   switch (y) {
