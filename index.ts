@@ -192,6 +192,29 @@ const getDataWithCoordinates = async (dataPoints: {
   const allCoords: GeoJsonPoint[] = [];
 
   for (const entry of dataPoints.map) {
+    // google lookup is simply wrong for martec college, use manual look up
+    if (
+      [
+        "MARTEC - Maritime and Polytechnic University College",
+        "MARTEC",
+      ].includes(entry.name)
+    ) {
+      allCoords.push({
+        geometry: {
+          coordinates: listOfUniversitiesThatRequireManualGeoLocation[
+            entry.name
+          ] ?? [0, 0],
+          type: "Point",
+        },
+        properties: {
+          name: entry.name,
+        },
+        type: "Feature",
+      });
+
+      continue;
+    }
+
     const coords = await getCoordinates(entry.name);
 
     allCoords.push(
