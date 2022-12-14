@@ -46,6 +46,19 @@ type UnivervisityWithInfoAndCoords = UniversityWithInfo & {
   location: GeoJsonPoint;
 };
 
+const listOfUniversitiesThatRequireManualGeoLocation: Record<
+  string,
+  [number, number]
+> = {
+  "Professionshøjskolen Absalon": [11.3450169, 55.4071304],
+  "MARTEC - Maritime and Polytechnic University College": [
+    10.5056852, 57.4275979,
+  ],
+  MARTEC: [10.5056852, 57.4275979],
+  "Københavns Erhvervsakademi (KEA)": [12.5524137, 55.6915283],
+  "Erhvervsakademi Dania": [9.837617, 55.8634911],
+};
+
 const removeDot = (amountString: string) => amountString.replace(/\./g, "");
 
 const formatRow = (row: SignUpInfo): FormattedSignUpInfo => {
@@ -184,7 +197,9 @@ const getDataWithCoordinates = async (dataPoints: {
     allCoords.push(
       coords ?? {
         geometry: {
-          coordinates: [0, 0],
+          coordinates: listOfUniversitiesThatRequireManualGeoLocation[
+            entry.name
+          ] ?? [0, 0],
           type: "Point",
         },
         properties: {
@@ -228,17 +243,11 @@ const saveData = (
 };
 
 const main = async () => {
-  const allData2020 = await parseCsv("hovedtal-2020.csv");
-  const allData2021 = await parseCsv("hovedtal-2021.csv");
-  const allData2022 = await parseCsv("hovedtal-2022.csv");
-
-  const data2020withCoords = await getDataWithCoordinates(allData2020);
-  const data2021withCoords = await getDataWithCoordinates(allData2021);
-  const data2022withCoords = await getDataWithCoordinates(allData2022);
-
-  saveData(data2020withCoords, "2020.json", "2020-uni.json");
-  saveData(data2021withCoords, "2021.json", "2021-uni.json");
-  saveData(data2022withCoords, "2022.json", "2022-uni.json");
+  for (const year of ["2022", "2021", "2020", "2019", "2018"]) {
+    const allData = await parseCsv(`hovedtal-${year}.csv`);
+    const allDataWithCoords = await getDataWithCoordinates(allData);
+    saveData(allDataWithCoords, `${year}.json`, `${year}-uni.json`);
+  }
 };
 
 main();
