@@ -39,3 +39,18 @@ export const stripSummerWinterInfo = (label: string) => {
   }
   return label;
 };
+
+export const stripeUniInfo = (label: string) => {
+  const profBach = label.indexOf("Professionsbachelor");
+  const comma = label.indexOf(",");
+
+  console.log(label, profBach);
+
+  if (profBach !== -1) {
+    return label.slice(profBach + 20);
+  } else if (comma !== -1) {
+    return label.slice(0, comma);
+  }
+
+  return label;
+};

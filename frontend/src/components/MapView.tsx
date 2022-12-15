@@ -252,7 +252,7 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
               setOverViewOpen,
             }}
           >
-            <UniOverview selectedUniversity={selectedUniversity} />
+            <UniOverview year={year} selectedUniversity={selectedUniversity} />
           </OverviewOpenContext.Provider>
         ) : null}
         <div className={styles.mapBody} ref={mapContainer} />

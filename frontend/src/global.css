@@ -56,3 +56,11 @@
   background-color: white;
   border-bottom: solid 1px darkgray;
 }
+
+.close-button {
+  font-size: 40px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
