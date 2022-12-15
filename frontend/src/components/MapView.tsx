@@ -11,6 +11,8 @@ interface IOverviewContext {
   setOverViewOpen(overviewOpen: boolean): void;
 }
 
+// https://www.youtube.com/watch?v=VZHueWiL4QI
+
 export const OverviewOpenContext = createContext<IOverviewContext>({
   overviewOpen: false,
   setOverViewOpen: () => {},
@@ -40,13 +42,15 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         projection: {
-          name: "globe",
+          name: "naturalEarth",
         },
-        style: "mapbox://styles/jonasgroendahl/clao6i2iz000f14p4ahoupklj",
+        style: "mapbox://styles/jonasgroendahl/clboqzajm000314mj9trnovor", // "mapbox://styles/jonasgroendahl/clboqa959000515lq0um6z7e8",
         center: [lng, lat],
         zoom: zoom,
         pitchWithRotate: false,
       });
+
+      map.setMaxBounds(map.getBounds());
 
       map.on("style.load", () => {
         map.setFog({
