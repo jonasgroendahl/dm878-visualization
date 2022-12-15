@@ -1,6 +1,8 @@
 import data2022 from "../../data/parsed/2022.json";
 import data2021 from "../../data/parsed/2021.json";
 import data2020 from "../../data/parsed/2020.json";
+import data2019 from "../../data/parsed/2019.json";
+import data2018 from "../../data/parsed/2018.json";
 
 export type DataYear = "2020" | "2021" | "2022" | "2019" | "2018";
 
@@ -22,6 +24,11 @@ export const getDataSet = (y: DataYear) => {
     case "2021":
       return data2021;
     case "2020":
+      return data2020;
+    case "2019":
+      return data2019;
+    case "2018":
+      return data2018;
     default:
       return data2020;
   }
