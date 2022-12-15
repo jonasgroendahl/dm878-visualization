@@ -4140,8 +4140,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          10.1913679,
-          56.15285489999999
+          10.1913846,
+          56.1528394
         ]
       },
       "properties": {
@@ -5232,8 +5232,8 @@
     "location": {
       "geometry": {
         "coordinates": [
-          0,
-          0
+          11.3450169,
+          55.4071304
         ],
         "type": "Point"
       },
@@ -7360,8 +7360,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.5129985,
-          55.78606929999999
+          12.511443,
+          55.7860285
         ]
       },
       "properties": {
@@ -7538,17 +7538,17 @@
     ],
     "name": "MARTEC - Maritime and Polytechnic University College",
     "location": {
+      "type": "Feature",
       "geometry": {
+        "type": "Point",
         "coordinates": [
-          0,
-          0
-        ],
-        "type": "Point"
+          -73.9865765,
+          40.6943708
+        ]
       },
       "properties": {
         "name": "MARTEC - Maritime and Polytechnic University College"
-      },
-      "type": "Feature"
+      }
     }
   },
   {
@@ -7956,8 +7956,8 @@
     "location": {
       "geometry": {
         "coordinates": [
-          0,
-          0
+          12.5524137,
+          55.6915283
         ],
         "type": "Point"
       },
@@ -8752,8 +8752,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          8.4469107,
-          55.4877012
+          9.7780195,
+          54.9134537
         ]
       },
       "properties": {
@@ -9434,8 +9434,8 @@
     "location": {
       "geometry": {
         "coordinates": [
-          0,
-          0
+          9.837617,
+          55.8634911
         ],
         "type": "Point"
       },

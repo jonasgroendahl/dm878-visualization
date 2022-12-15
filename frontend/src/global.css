@@ -6,6 +6,33 @@
   display: flex;
 }
 
+.tabs.year {
+  gap: 5px;
+}
+
+.tabs.year button {
+  border-radius: 18px;
+  font-size: 12px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightcoral;
+  color: white;
+  cursor: pointer;
+}
+
+.tabs.year .selected {
+  background-color: brown;
+}
+
+.tabs-headline {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
 .tabs button {
   border: none;
   padding: 15px;
@@ -16,4 +43,24 @@
   background-color: cornflowerblue;
   color: white;
   font-weight: 600;
+}
+
+.tabs.top button {
+  font-size: 18px;
+  color: black;
+  background-color: white;
+}
+
+.tabs.top {
+  width: 100%;
+  background-color: white;
+  border-bottom: solid 1px darkgray;
+}
+
+.close-button {
+  font-size: 40px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
 }
