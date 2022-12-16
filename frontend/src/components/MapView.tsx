@@ -1,10 +1,9 @@
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { createContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import styles from "../../styles/MapView.module.css";
 import { Data, DataYear } from "../common";
 import { UniOverview } from "./UniOverview";
-import React from "react";
 
 interface IOverviewContext {
   overviewOpen: boolean;
@@ -52,16 +51,6 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
 
       map.setMaxBounds(map.getBounds());
 
-      map.on("style.load", () => {
-        map.setFog({
-          color: "rgb(186, 210, 235)", // Lower atmosphere
-          "high-color": "rgb(36, 92, 223)", // Upper atmosphere
-          "horizon-blend": 0.02, // Atmosphere thickness (default 0.2 at low zooms)
-          "space-color": "rgb(11, 11, 25)", // Background color
-          "star-intensity": 0.6, // Background star brightness (default 0.35 at low zoooms )
-        });
-      });
-
       map.on("load", () => {
         const geojson = {
           type: "FeatureCollection",
@@ -97,15 +86,7 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
               6,
               "#f28cb1",
             ],
-            "circle-radius": [
-              "step",
-              ["get", "point_count"],
-              20,
-              100,
-              30,
-              750,
-              140,
-            ],
+            "circle-radius": ["step", ["get", "point_count"], 13, 4, 16, 6, 19],
           },
         });
 
@@ -149,14 +130,14 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
               ["get", "propertySum"],
               10,
               500,
-              15,
+              13,
               1500,
-              20,
+              16,
               4000,
-              25,
+              19,
             ],
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#AAF5AB",
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#fff",
           },
         });
 
@@ -194,13 +175,26 @@ const MapView: React.FC<{ year: DataYear; data: Data }> = React.memo(
           }
         });
 
-        map.on("mouseenter", "unclustered-point", () => {
+        const popup = new mapboxgl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+        });
+
+        map.on("mouseenter", "unclustered-point", (e) => {
           map.getCanvas().style.cursor = "pointer";
+
+          if (e.features !== undefined) {
+            const name = e.features[0].properties?.name;
+            const coordinates = e.features[0].geometry.coordinates;
+
+            popup.setLngLat(coordinates).setHTML(name).addTo(map);
+          }
         });
 
         // Change it back to a pointer when it leaves.
         map.on("mouseleave", "unclustered-point", () => {
           map.getCanvas().style.cursor = "";
+          popup.remove();
         });
 
         map.on("mouseenter", "clusters", () => {
