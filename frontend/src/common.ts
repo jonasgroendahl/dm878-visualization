@@ -54,7 +54,9 @@ export const stripeUniInfo = (label: string) => {
   console.log(label, profBach);
 
   if (profBach !== -1) {
-    return label.slice(profBach + 20);
+    const newLabel = label.slice(profBach + 21);
+
+    return newLabel.charAt(0).toUpperCase() + newLabel.slice(1);
   } else if (comma !== -1) {
     return label.slice(0, comma);
   }

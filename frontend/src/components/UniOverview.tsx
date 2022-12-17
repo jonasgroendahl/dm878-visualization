@@ -17,6 +17,7 @@ import {
   stripeUniInfo,
   stripSummerWinterInfo,
 } from "../common";
+import { MostDifficult } from "../MostDifficult";
 import { OverviewOpenContext } from "./MapView";
 
 interface UniData {
@@ -40,19 +41,6 @@ export const UniOverview: React.FC<UniData> = ({
     setSelectedYear(year);
   }, [selectedUniversity, year]);
 
-  const mostDifficultMajors = selectedDataSet?.items
-    .map((item) => {
-      return {
-        ratio: item.totalApplicants / item.totalAccepted,
-        name: stripeUniInfo(stripSummerWinterInfo(item.educationAndPlace)),
-        originalName: item.educationAndPlace,
-        accepted: item.totalAccepted,
-        applicants: item.totalApplicants,
-      };
-    })
-    .sort((x, y) => y.ratio - x.ratio)
-    .slice(0, 5);
-
   const dataPointsOtherYears: DataYear[] = [
     { y: "2018", data: getDataSet("2018") },
     { y: "2019", data: getDataSet("2019") },
@@ -71,7 +59,9 @@ export const UniOverview: React.FC<UniData> = ({
     })
     .map((d) => d.y as DataYear);
 
-  console.log("most diff", mostDifficultMajors);
+  const items = selectedDataSet?.items.sort(
+    (x, y) => Number(y.totalAccepted) - Number(x.totalAccepted)
+  );
 
   return (
     <>
@@ -84,9 +74,11 @@ export const UniOverview: React.FC<UniData> = ({
               padding: "5px 20px",
               boxSizing: "border-box",
               width: "100%",
+              borderBottom: "solid 1px #eee",
+              marginBottom: 10,
             }}
           >
-            <h2>{selectedUniversity.name}</h2>
+            <h1>{selectedUniversity.name}</h1>
             <div style={{ flexGrow: 1 }} />
             <div>
               <p style={{ textAlign: "center", marginBottom: 5 }}>
@@ -119,80 +111,54 @@ export const UniOverview: React.FC<UniData> = ({
             </button>
           </div>
           <div className={styles.uniListView}>
-            {selectedDataSet?.items
-              .sort((x, y) => Number(y.totalAccepted) - Number(x.totalAccepted))
-              .map((item) => {
-                return (
-                  <div className={styles.uniListItem}>
-                    <p className={styles.numOfAccepted}>{item.totalAccepted}</p>
-                    <p>{item.educationAndPlace}</p>
-                  </div>
-                );
-              })}
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Applicants</th>
+                  <th>Accepted</th>
+                  <th>Prio 1</th>
+                  <th>Grade</th>
+                  <th>Standby</th>
+                  <th>Season</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items?.map((item) => {
+                  return (
+                    <tr>
+                      <td>
+                        {stripeUniInfo(
+                          stripSummerWinterInfo(item.educationAndPlace)
+                        )}
+                      </td>
+                      <td>{item.totalApplicants}</td>
+                      <td>{item.totalAccepted}</td>
+                      <td>{item.firstPrio}</td>
+                      <td>{item.grade}</td>
+                      <td>{item.standby}</td>
+                      <td>
+                        {item.educationAndPlace.includes("sommer") ? (
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
+                            height={30}
+                          />
+                        ) : null}
+                        {item.educationAndPlace.includes("vinter") ? (
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
+                            height={30}
+                          />
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-          <div>
-            <p className="tabs-headline">Most difficult major to get in</p>
-            <VictoryChart
-              width={1000}
-              horizontal
-              padding={{
-                left: 300,
-                top: 20,
-                bottom: 30,
-                right: 20,
-              }}
-              domainPadding={20}
-            >
-              <VictoryAxis
-                tickLabelComponent={
-                  <VictoryLabel
-                    text={(c) => mostDifficultMajors?.[c.index].name ?? ""}
-                    style={{
-                      fontSize: 10,
-                    }}
-                  />
-                }
-              />
-              <VictoryAxis dependentAxis />
-              <VictoryStack colorScale={["tomato", "orange"]}>
-                <VictoryBar
-                  data={mostDifficultMajors?.map((m) => {
-                    return {
-                      x: m.originalName,
-                      y: m.applicants,
-                      name: m.name,
-                    };
-                  })}
-                />
-                <VictoryBar
-                  data={mostDifficultMajors?.map((m) => {
-                    return {
-                      x: m.originalName,
-                      y: m.accepted,
-                      name: m.name,
-                    };
-                  })}
-                />
-              </VictoryStack>
-              <VictoryLegend
-                data={[
-                  {
-                    name: "Applied",
-                    symbol: {
-                      fill: "tomato",
-                    },
-                  },
-                  {
-                    name: "Accepted",
-                    symbol: {
-                      fill: "orange",
-                    },
-                  },
-                ]}
-                x={0}
-              />
-            </VictoryChart>
-          </div>
+          <hr />
+          <MostDifficult data={selectedDataSet} />
         </div>
       ) : null}
     </>
