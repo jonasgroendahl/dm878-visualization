@@ -19,6 +19,7 @@ import {
 } from "../common";
 import { MostDifficult } from "../MostDifficult";
 import { OverviewOpenContext } from "./MapView";
+import SummerWinter from "./summerWinter";
 
 interface UniData {
   selectedUniversity: undefined | typeof data[number];
@@ -67,17 +68,7 @@ export const UniOverview: React.FC<UniData> = ({
     <>
       {selectedUniversity && overviewOpen ? (
         <div className={styles.overviewBody}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "5px 20px",
-              boxSizing: "border-box",
-              width: "100%",
-              borderBottom: "solid 1px #eee",
-              marginBottom: 10,
-            }}
-          >
+          <div className={styles.topBar}>
             <h1>{selectedUniversity.name}</h1>
             <div style={{ flexGrow: 1 }} />
             <div>
@@ -110,55 +101,60 @@ export const UniOverview: React.FC<UniData> = ({
               ✖
             </button>
           </div>
-          <div className={styles.uniListView}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Applicants</th>
-                  <th>Accepted</th>
-                  <th>Prio 1</th>
-                  <th>Grade</th>
-                  <th>Standby</th>
-                  <th>Season</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items?.map((item) => {
-                  return (
-                    <tr>
-                      <td>
-                        {stripeUniInfo(
-                          stripSummerWinterInfo(item.educationAndPlace)
-                        )}
-                      </td>
-                      <td>{item.totalApplicants}</td>
-                      <td>{item.totalAccepted}</td>
-                      <td>{item.firstPrio}</td>
-                      <td>{item.grade}</td>
-                      <td>{item.standby}</td>
-                      <td>
-                        {item.educationAndPlace.includes("sommer") ? (
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
-                            height={30}
-                          />
-                        ) : null}
-                        {item.educationAndPlace.includes("vinter") ? (
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
-                            height={30}
-                          />
-                        ) : null}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div>
+            <div className={styles.uniListView}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Applicants</th>
+                    <th>Accepted</th>
+                    <th>Prio 1</th>
+                    <th>Grade</th>
+                    <th>Standby</th>
+                    <th>Season</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items?.map((item) => {
+                    return (
+                      <tr>
+                        <td>
+                          {stripeUniInfo(
+                            stripSummerWinterInfo(item.educationAndPlace)
+                          )}
+                        </td>
+                        <td>{item.totalApplicants}</td>
+                        <td>{item.totalAccepted}</td>
+                        <td>{item.firstPrio}</td>
+                        <td>{item.grade}</td>
+                        <td>{item.standby}</td>
+                        <td>
+                          {item.educationAndPlace.includes("sommer") ? (
+                            <img
+                              src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
+                              height={30}
+                            />
+                          ) : null}
+                          {item.educationAndPlace.includes("vinter") ? (
+                            <img
+                              src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
+                              height={30}
+                            />
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <hr />
+            <MostDifficult data={selectedDataSet} />
+            <div>
+              <SummerWinter data={selectedDataSet} />
+            </div>
           </div>
-          <hr />
-          <MostDifficult data={selectedDataSet} />
         </div>
       ) : null}
     </>

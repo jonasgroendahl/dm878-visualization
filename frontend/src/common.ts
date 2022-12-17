@@ -1,8 +1,8 @@
-import data2022 from "../../data/parsed/2022.json";
-import data2021 from "../../data/parsed/2021.json";
-import data2020 from "../../data/parsed/2020.json";
-import data2019 from "../../data/parsed/2019.json";
 import data2018 from "../../data/parsed/2018.json";
+import data2019 from "../../data/parsed/2019.json";
+import data2020 from "../../data/parsed/2020.json";
+import data2021 from "../../data/parsed/2021.json";
+import data2022 from "../../data/parsed/2022.json";
 
 export type DataYear = "2020" | "2021" | "2022" | "2019" | "2018";
 
@@ -62,4 +62,8 @@ export const stripeUniInfo = (label: string) => {
   }
 
   return label;
+};
+
+export const stripAllButSeasonInfo = (label: string) => {
+  return label.substring(label.indexOf(": ") + 1);
 };

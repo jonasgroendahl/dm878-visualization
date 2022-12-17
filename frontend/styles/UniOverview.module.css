@@ -2,8 +2,7 @@
   z-index: 100;
   width: 100%;
   position: absolute;
-  max-height: 100vh;
-  min-height: 100vh;
+  height: 100vh;
   overflow: scroll;
   background: white;
   color: black;
@@ -12,7 +11,27 @@
   flex-direction: column;
 }
 
+.topBar {
+  display: flex;
+  height: 6rem;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 20px;
+  box-sizing: border-box;
+  width: 100%;
+  border-bottom: solid 1px "#eee";
+  margin-bottom: 10;
+  position: fixed;
+  background-color: white;
+  z-index: 40;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
 .uniListView {
+  padding-top: 7rem;
+  padding-bottom: 2rem;
+  min-height: 40vh;
+  max-height: 40vh;
   overflow: auto;
 }
 
