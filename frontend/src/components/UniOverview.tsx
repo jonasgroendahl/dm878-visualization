@@ -69,6 +69,26 @@ export const UniOverview: React.FC<UniData> = ({
       {selectedUniversity && overviewOpen ? (
         <div className={styles.overviewBody}>
           <div className={styles.topBar}>
+            <button
+              className="close-button"
+              onClick={() => setOverViewOpen(false)}
+              style={{ paddingRight: 20, paddingTop: 5 }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="40"
+                height="40"
+                fill="currentColor"
+                class="bi bi-chevron-left"
+                viewBox="0 0 15 15"
+              >
+                {" "}
+                <path
+                  fill-rule="evenodd"
+                  d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                />{" "}
+              </svg>
+            </button>
             <h1>{selectedUniversity.name}</h1>
             <div style={{ flexGrow: 1 }} />
             <div>
@@ -93,13 +113,6 @@ export const UniOverview: React.FC<UniData> = ({
                 ))}
               </div>
             </div>
-            <button
-              className="close-button"
-              onClick={() => setOverViewOpen(false)}
-              style={{ paddingLeft: 50 }}
-            >
-              ✖
-            </button>
           </div>
           <div>
             <div className={styles.uniListView}>
