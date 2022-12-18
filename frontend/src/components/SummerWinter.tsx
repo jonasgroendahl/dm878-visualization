@@ -98,21 +98,36 @@ const SummerWinter: React.FC<ISummerWinterProps> = ({ data }) => {
           {
             target: "data",
             eventHandlers: {
-              onClick: (event) => {
-                console.log("event: ", event);
+              onMouseDown: (_event, _data) => {
                 return [
                   {
-                    target: "data",
+                    eventKey: "all", // reset style for all bars, default target goes to data
+                    mutation: () => undefined,
+                  },
+                ];
+              },
+              onMouseUp: (_event, _data) => {
+                return [
+                  {
+                    // eventKey: 'all', // reset style for all bars, default target goes to data
                     mutation: (props) => {
-                      console.log("seasonSelected: ", seasonSelected);
-                      console.log("Props:", props);
-                      props.datum.label === "seasonSelected"
-                        ? setSeasonSelected("Total")
-                        : setSeasonSelected(props.datum.label);
-
-                      // return props.style.fill === "#c43a31"
-                      //   ? null
-                      //   : { style: { fill: "#c43a31" } };
+                      setSeasonSelected(props.datum.label);
+                      // set selected bar red - target "data" is default and eventKey is current element
+                      if (props.datum.label === seasonSelected) {
+                        if (seasonSelected === "Winter start") {
+                          setSeasonSelected("Total");
+                          return { style: { fill: "orange" } };
+                        } else if (seasonSelected === "Summer start") {
+                          setSeasonSelected("Total");
+                          return { style: { fill: "tomato" } };
+                        }
+                      } else {
+                        return {
+                          style: Object.assign({}, props.style, {
+                            fill: "red",
+                          }),
+                        };
+                      }
                     },
                   },
                 ];
@@ -125,6 +140,7 @@ const SummerWinter: React.FC<ISummerWinterProps> = ({ data }) => {
           { x: 2, y: winterStart.length, label: "Winter start" },
         ]}
       />
+
       <div className={styles.sumWinTable}>
         <h3>{seasonSelected}</h3>
         <span>Total Accepted: {totalAcceptedForSeason(seasonSelected)}</span>

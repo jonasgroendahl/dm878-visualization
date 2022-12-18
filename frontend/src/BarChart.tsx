@@ -87,7 +87,7 @@ export const BarChart: React.FC<IBarChartProps> = ({
       //@ts-expect-error not sure
       .attr("x", (d) => xScale(d.name))
       .attr("y", (d) => yScale(d.value))
-      .attr("fill", "red");
+      .attr("fill", "tomato");
 
     const labels = svg
       .selectAll(".x text")
