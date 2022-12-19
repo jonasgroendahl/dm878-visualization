@@ -1,3 +1,8 @@
+body {
+  font-family: Tahoma, sans-serif;
+  background-color: #fefeff;
+}
+
 .bar:hover {
   opacity: 0.5;
 }
@@ -11,19 +16,23 @@
 }
 
 .tabs.year button {
-  border-radius: 18px;
+  border-radius: 10px;
   font-size: 12px;
   height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: lightcoral;
+  background-color: #787375;
   color: white;
   cursor: pointer;
 }
 
 .tabs.year .selected {
-  background-color: brown;
+  background-color: #3a3335;
+}
+
+.tabs.year button:hover {
+  background-color: #3a333585;
 }
 
 .tabs-headline {
@@ -34,15 +43,26 @@
 }
 
 .tabs button {
+  border-radius: 12px;
   border: none;
   padding: 15px;
   outline: none;
+  margin: 3px;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  background-color: lightgrey;
 }
 
 .tabs .selected {
-  background-color: cornflowerblue;
+  background-color: #4ea6da;
   color: white;
   font-weight: 600;
+}
+
+.tabs .selected:hover {
+  background-color: #4ea6da;
 }
 
 .tabs.top button {
@@ -51,10 +71,15 @@
   background-color: white;
 }
 
+.tabs.top button:hover {
+  background-color: rgba(255, 255, 255, 0);
+}
+
 .tabs.top {
   width: 100%;
   background-color: white;
-  border-bottom: solid 1px darkgray;
+  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+    rgba(17, 17, 26, 0.1) 0px 0px 8px;
 }
 
 .close-button {

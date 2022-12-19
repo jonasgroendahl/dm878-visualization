@@ -1,0 +1,12 @@
+.summerWinterBody {
+  display: flex;
+  flex-direction: row;
+  height: full;
+  align-items: center;
+}
+
+.sumWinTable {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}

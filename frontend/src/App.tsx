@@ -107,7 +107,7 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ minWidth: "50vw", borderRight: "solid 1px #eee" }}>
+      <div style={{ minWidth: "40vw", borderRight: "solid 1px #eee" }}>
         <MapView data={mapData} year={year} />
       </div>
       <div style={{ flex: 1 }}>

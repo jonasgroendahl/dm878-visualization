@@ -19,6 +19,7 @@ import {
 } from "../common";
 import { MostDifficult } from "../MostDifficult";
 import { OverviewOpenContext } from "./MapView";
+import SummerWinter from "./summerWinter";
 
 interface UniData {
   selectedUniversity: undefined | typeof data[number];
@@ -67,17 +68,27 @@ export const UniOverview: React.FC<UniData> = ({
     <>
       {selectedUniversity && overviewOpen ? (
         <div className={styles.overviewBody}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "5px 20px",
-              boxSizing: "border-box",
-              width: "100%",
-              borderBottom: "solid 1px #eee",
-              marginBottom: 10,
-            }}
-          >
+          <div className={styles.topBar}>
+            <button
+              className="close-button"
+              onClick={() => setOverViewOpen(false)}
+              style={{ paddingRight: 20, paddingTop: 5 }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="40"
+                height="40"
+                fill="currentColor"
+                class="bi bi-chevron-left"
+                viewBox="0 0 15 15"
+              >
+                {" "}
+                <path
+                  fill-rule="evenodd"
+                  d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                />{" "}
+              </svg>
+            </button>
             <h1>{selectedUniversity.name}</h1>
             <div style={{ flexGrow: 1 }} />
             <div>
@@ -102,63 +113,84 @@ export const UniOverview: React.FC<UniData> = ({
                 ))}
               </div>
             </div>
-            <button
-              className="close-button"
-              onClick={() => setOverViewOpen(false)}
-              style={{ paddingLeft: 50 }}
-            >
-              ✖
-            </button>
           </div>
-          <div className={styles.uniListView}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Applicants</th>
-                  <th>Accepted</th>
-                  <th>Prio 1</th>
-                  <th>Grade</th>
-                  <th>Standby</th>
-                  <th>Season</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items?.map((item) => {
-                  return (
-                    <tr>
-                      <td>
-                        {stripeUniInfo(
-                          stripSummerWinterInfo(item.educationAndPlace)
-                        )}
-                      </td>
-                      <td>{item.totalApplicants}</td>
-                      <td>{item.totalAccepted}</td>
-                      <td>{item.firstPrio}</td>
-                      <td>{item.grade}</td>
-                      <td>{item.standby}</td>
-                      <td>
-                        {item.educationAndPlace.includes("sommer") ? (
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
-                            height={30}
-                          />
-                        ) : null}
-                        {item.educationAndPlace.includes("vinter") ? (
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
-                            height={30}
-                          />
-                        ) : null}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div>
+            <div className={styles.uniListView}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Applicants</th>
+                    <th>Accepted</th>
+                    <th>Prio 1</th>
+                    <th>Grade</th>
+                    <th>Standby</th>
+                    <th>Season</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items?.map((item) => {
+                    let hasWinter = false;
+                    let hasSummer = false;
+
+                    if (
+                      item.educationAndPlace.toLowerCase().includes("vinter") ||
+                      item.educationAndPlace.toLowerCase().includes("winter")
+                    ) {
+                      hasWinter = true;
+                    }
+
+                    if (!hasWinter) {
+                      hasSummer = true;
+                    } else {
+                      if (
+                        item.educationAndPlace
+                          .toLowerCase()
+                          .includes("sommer") ||
+                        item.educationAndPlace.toLowerCase().includes("summer")
+                      ) {
+                        hasSummer = true;
+                      }
+                    }
+
+                    return (
+                      <tr>
+                        <td>
+                          {stripeUniInfo(
+                            stripSummerWinterInfo(item.educationAndPlace)
+                          )}
+                        </td>
+                        <td>{item.totalApplicants}</td>
+                        <td>{item.totalAccepted}</td>
+                        <td>{item.firstPrio}</td>
+                        <td>{item.grade}</td>
+                        <td>{item.standby}</td>
+                        <td>
+                          {hasSummer ? (
+                            <img
+                              src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
+                              height={30}
+                            />
+                          ) : null}
+                          {hasWinter ? (
+                            <img
+                              src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
+                              height={30}
+                            />
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <hr />
+            <MostDifficult data={selectedDataSet} />
+            <div>
+              <SummerWinter data={selectedDataSet} />
+            </div>
           </div>
-          <hr />
-          <MostDifficult data={selectedDataSet} />
         </div>
       ) : null}
     </>
