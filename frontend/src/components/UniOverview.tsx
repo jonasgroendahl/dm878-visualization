@@ -130,6 +130,29 @@ export const UniOverview: React.FC<UniData> = ({
                 </thead>
                 <tbody>
                   {items?.map((item) => {
+                    let hasWinter = false;
+                    let hasSummer = false;
+
+                    if (
+                      item.educationAndPlace.toLowerCase().includes("vinter") ||
+                      item.educationAndPlace.toLowerCase().includes("winter")
+                    ) {
+                      hasWinter = true;
+                    }
+
+                    if (!hasWinter) {
+                      hasSummer = true;
+                    } else {
+                      if (
+                        item.educationAndPlace
+                          .toLowerCase()
+                          .includes("sommer") ||
+                        item.educationAndPlace.toLowerCase().includes("summer")
+                      ) {
+                        hasSummer = true;
+                      }
+                    }
+
                     return (
                       <tr>
                         <td>
@@ -143,13 +166,13 @@ export const UniOverview: React.FC<UniData> = ({
                         <td>{item.grade}</td>
                         <td>{item.standby}</td>
                         <td>
-                          {item.educationAndPlace.includes("sommer") ? (
+                          {hasSummer ? (
                             <img
                               src="https://cdn-icons-png.flaticon.com/512/169/169367.png"
                               height={30}
                             />
                           ) : null}
-                          {item.educationAndPlace.includes("vinter") ? (
+                          {hasWinter ? (
                             <img
                               src="https://cdn-icons-png.flaticon.com/512/2077/2077008.png"
                               height={30}
